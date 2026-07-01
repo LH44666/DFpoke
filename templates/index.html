@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}三角洲记牌器 - 排行榜{% endblock %}
+{% block extra_style %}
+.hero {
+    text-align: center;
+    padding: 40px 0 30px;
+}
+.hero h1 { font-size: 28px; color: #f4a100; margin-bottom: 8px; }
+.hero p { color: #94a3b8; font-size: 15px; }
+.leaderboard {
+    background: #1a2634;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 20px;
+}
+.lb-header {
+    display: grid;
+    grid-template-columns: 50px 1fr 120px 100px;
+    padding: 12px 20px;
+    background: #243447;
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: bold;
+}
+.lb-row {
+    display: grid;
+    grid-template-columns: 50px 1fr 120px 100px;
+    padding: 14px 20px;
+    border-bottom: 1px solid #243447;
+    align-items: center;
+    transition: background 0.2s;
+}
+.lb-row:hover { background: #24344720; }
+.lb-row:last-child { border-bottom: none; }
+.rank {
+    font-weight: bold;
+    font-size: 16px;
+}
+.rank-1 { color: #ffd700; }
+.rank-2 { color: #c0c0c0; }
+.rank-3 { color: #cd7f32; }
+.username a {
+    color: #e0e0e0;
+    text-decoration: none;
+    font-weight: 500;
+}
+.username a:hover { color: #f4a100; }
+.progress-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: #0f1923;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.progress-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+.progress-text {
+    font-size: 13px;
+    color: #94a3b8;
+    text-align: right;
+}
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #64748b;
+}
+.actions { text-align: center; margin-top: 24px; }
+.actions a { margin: 0 8px; }
+
+.daily-section {
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+.daily-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #f4a100;
+    margin-bottom: 12px;
+    text-align: center;
+}
+.daily-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+.daily-card {
+    background: #1a2634;
+    border-radius: 10px;
+    padding: 14px 8px;
+    text-align: center;
+    border: 1px solid #243447;
+}
+.daily-card .map-name {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 6px;
+}
+.daily-card .code {
+    font-size: 24px;
+    font-weight: bold;
+    color: #22c55e;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 3px;
+}
+.daily-date {
+    text-align: center;
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 6px;
+}
+@media (max-width: 480px) {
+    .daily-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 4px;
+    }
+    .daily-card { padding: 10px 4px; }
+    .daily-card .map-name { font-size: 10px; }
+    .daily-card .code { font-size: 18px; letter-spacing: 1px; }
+}
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>三角洲行动 - 扑克牌收集</h1>
+    <p>集齐 {{ total }} 张牌（52张 + 大小王 + 牌盒）完成挑战！</p>
+</div>
+
+<div class="actions">
+    {% if not session.get('user') %}
+    <a href="/register" class="btn">立即注册</a>
+    <a href="/login" class="btn btn-outline">已有账号</a>
+    {% endif %}
+</div>
+
+{% if keywords and keywords.list %}
+<div class="daily-section">
+    <div class="daily-grid">
+        {% for kw in keywords.list %}
+        <div class="daily-card">
+            <div class="map-name">{{ kw.mapName }}</div>
+            <div class="code">{{ kw.secret }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="leaderboard">
+    <div class="lb-header">
+        <div>#</div>
+        <div>玩家</div>
+        <div>进度</div>
+        <div></div>
+    </div>
+    {% if users %}
+        {% for user in users %}
+        <div class="lb-row">
+            <div class="rank rank-{{ loop.index }}">{{ loop.index }}</div>
+            <div class="username"><a href="/{{ user['username'] }}">{{ user['username'] }}</a></div>
+            <div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" style="width: {{ (user['collected'] / total * 100)|round(1) }}%; background: {% if user['collected'] == total %}#22c55e{% elif user['collected'] > total * 0.7 %}#f4a100{% else %}#3b82f6{% endif %};"></div>
+                </div>
+            </div>
+            <div class="progress-text">{{ user['collected'] }} / {{ total }}</div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">还没有玩家注册，快来成为第一个！</div>
+    {% endif %}
+</div>
+{% endblock %}

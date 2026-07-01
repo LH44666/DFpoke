@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}登录 - 三角洲记牌器{% endblock %}
+{% block extra_style %}
+.form-box {
+    max-width: 400px;
+    margin: 60px auto;
+    background: #1a2634;
+    padding: 32px;
+    border-radius: 10px;
+}
+.form-box h2 { text-align: center; margin-bottom: 24px; color: #f4a100; }
+.form-box .btn { width: 100%; margin-top: 8px; }
+.form-footer { text-align: center; margin-top: 16px; font-size: 13px; color: #94a3b8; }
+.form-footer a { color: #f4a100; text-decoration: none; }
+{% endblock %}
+
+{% block content %}
+<div class="form-box">
+    <h2>登录</h2>
+    <form method="POST">
+        <label>用户名</label>
+        <input type="text" name="username" required autocomplete="username">
+        <label>密码</label>
+        <input type="password" name="password" required autocomplete="current-password">
+        <button type="submit" class="btn">登录</button>
+    </form>
+    <div class="form-footer">没有账号？<a href="/register">去注册</a></div>
+</div>
+{% endblock %}

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DF记牌器">
+    <meta name="theme-color" content="#0f1923">
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/icon-180.png">
+    <title>{% block title %}三角洲扑克牌收集器{% endblock %}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0f1923;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        .navbar {
+            background: #1a2634;
+            padding: 12px 20px;
+            padding-top: calc(12px + env(safe-area-inset-top));
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f4a100;
+        }
+        .navbar a {
+            color: #f4a100;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .navbar .nav-links a {
+            color: #aaa;
+            margin-left: 16px;
+            font-size: 14px;
+            font-weight: normal;
+        }
+        .navbar .nav-links a:hover { color: #f4a100; }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .flash {
+            padding: 10px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        .flash.success { background: #1b4332; color: #95d5b2; }
+        .flash.error { background: #461220; color: #f4978e; }
+        .btn {
+            display: inline-block;
+            padding: 10px 24px;
+            background: #f4a100;
+            color: #0f1923;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .btn:hover { background: #d48f00; }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #f4a100;
+            color: #f4a100;
+        }
+        .btn-outline:hover { background: #f4a10020; }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px 14px;
+            background: #1a2634;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        input:focus { outline: none; border-color: #f4a100; }
+        label { display: block; margin-bottom: 4px; font-size: 13px; color: #94a3b8; }
+        .pwa-hint {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 30px;
+            cursor: pointer;
+        }
+        .pwa-hint-box {
+            background: #1a2634;
+            border-radius: 12px;
+            padding: 20px 24px;
+            text-align: center;
+            max-width: 300px;
+            margin-bottom: 16px;
+            border: 1px solid #334155;
+        }
+        .pwa-hint-box p {
+            font-size: 14px;
+            color: #e0e0e0;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        .pwa-hint-box .steps {
+            font-size: 13px;
+            color: #94a3b8;
+            text-align: left;
+        }
+        .pwa-hint-arrow {
+            font-size: 40px;
+            animation: bounceDown 1s infinite;
+        }
+        @keyframes bounceDown {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+        .pwa-hint-close {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 8px;
+        }
+        .pwa-trigger {
+            cursor: pointer;
+            font-size: 14px;
+            color: #aaa;
+            margin-left: 16px;
+        }
+        .pwa-trigger:hover { color: #f4a100; }
+        .announce-bar {
+            margin-top: 20px;
+            background: #1a2634;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 10px 16px;
+            overflow: hidden;
+            height: 38px;
+            position: relative;
+        }
+        .announce-bar .announce-title {
+            font-size: 12px;
+            color: #f4a100;
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .announce-bar .announce-list {
+            margin-left: 50px;
+            position: relative;
+            height: 100%;
+        }
+        .announce-bar .announce-item {
+            font-size: 13px;
+            color: #94a3b8;
+            line-height: 18px;
+            position: absolute;
+            width: 100%;
+            top: 0;
+            opacity: 0;
+            transition: opacity 0.5s, transform 0.5s;
+            transform: translateY(10px);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .announce-bar .announce-item.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        {% block extra_style %}{% endblock %}
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/">🃏 三角洲记牌器</a>
+        <div class="nav-links">
+            {% if session.get('user') %}
+                <a href="/{{ session['user'] }}">我的牌</a>
+                <a href="/logout">退出</a>
+            {% else %}
+                <a href="/login">登录</a>
+                <a href="/register">注册</a>
+            {% endif %}
+            <span class="pwa-trigger" id="pwaBtn" onclick="showPwaHint()" style="display:none">📲</span>
+        </div>
+    </nav>
+
+    <div class="pwa-hint" id="pwaOverlay" style="display:none" onclick="hidePwaHint()">
+        <div class="pwa-hint-box" onclick="event.stopPropagation()">
+            <p>📲 <b>添加到主屏幕</b></p>
+            <div class="steps" id="pwaSteps"></div>
+            <div class="pwa-hint-close">点击空白处关闭</div>
+        </div>
+        <div class="pwa-hint-arrow" id="pwaArrow">⬇️</div>
+    </div>
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+        {% if announcements %}
+        <div class="announce-bar">
+            <span class="announce-title">📢 公告</span>
+            <div class="announce-list" id="announceList">
+                {% for a in announcements %}
+                <div class="announce-item {% if loop.first %}active{% endif %}">{{ a.msg }}</div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% block scripts %}{% endblock %}
+    <script>
+    (function() {
+        var isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+        if (isStandalone) return;
+        var btn = document.getElementById('pwaBtn');
+        if (btn) btn.style.display = '';
+        var isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
+        var steps = document.getElementById('pwaSteps');
+        if (isIOS) {
+            steps.innerHTML = '1. 点击底部 <b>分享按钮</b> ↗️<br>2. 向下滑动找到<br><b>"添加到主屏幕"</b><br>3. 点击右上角"添加"';
+        } else {
+            steps.innerHTML = '1. 点击浏览器右上角 <b>⋮</b><br>2. 选择<b>"添加到主屏幕"</b><br>3. 点击"添加"';
+        }
+        var arrow = document.getElementById('pwaArrow');
+        if (isIOS) {
+            arrow.style.position = 'fixed';
+            arrow.style.bottom = '10px';
+        }
+    })();
+    function showPwaHint() {
+        document.getElementById('pwaOverlay').style.display = '';
+    }
+    function hidePwaHint() {
+        document.getElementById('pwaOverlay').style.display = 'none';
+    }
+
+    (function() {
+        var list = document.getElementById('announceList');
+        if (!list) return;
+        var items = list.querySelectorAll('.announce-item');
+        if (items.length <= 1) return;
+        var cur = 0;
+        setInterval(function() {
+            items[cur].classList.remove('active');
+            cur = (cur + 1) % items.length;
+            items[cur].classList.add('active');
+        }, 3000);
+    })();
+    </script>
+</body>
+</html>
