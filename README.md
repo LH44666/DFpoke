@@ -4,7 +4,7 @@
 
 A web-based card collection tracker for the Delta Force (三角洲行动) playing card event. Players collect 54 playing cards + 1 card box (55 total), and this app helps track progress.
 
-**Live demo:** [http://1.12.249.7:8080](http://1.12.249.7:8080)
+**Live demo:** [http://dfpoke.site](http://dfpoke.site)
 
 ## Screenshots
 
