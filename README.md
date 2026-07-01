@@ -8,7 +8,7 @@ A web-based card collection tracker for the Delta Force (三角洲行动) playin
 
 ## Screenshots
 
-> TODO: Add screenshots
+![DFpoke Screenshot](static/screenshot.png)
 
 ## Features
 

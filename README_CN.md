@@ -8,7 +8,7 @@
 
 ## 截图
 
-> TODO: 添加截图
+![DFpoke 截图](static/screenshot.png)
 
 ## 功能介绍
 
