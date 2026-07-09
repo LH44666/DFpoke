@@ -1,16 +1,24 @@
 {
   "name": "三角洲记牌器",
   "short_name": "DF记牌器",
+  "description": "三角洲行动扑克牌收集活动记牌器",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f1923",
   "theme_color": "#0f1923",
+  "orientation": "portrait",
   "icons": [
+    {
+      "src": "/static/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
     {
       "src": "/static/icon.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ]
 }

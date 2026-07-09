@@ -210,19 +210,25 @@
         {% endfor %}
         {% endwith %}
         {% block content %}{% endblock %}
-        {% if announcements %}
         <div class="announce-bar">
             <span class="announce-title">📢 公告</span>
             <div class="announce-list" id="announceList">
                 {% for a in announcements %}
                 <div class="announce-item {% if loop.first %}active{% endif %}">{{ a.msg }}</div>
                 {% endfor %}
+                <div class="announce-item">💡 军需处医疗部门-特殊道具新增阿萨拉牌-牌盒兑换配方，未拥有阿萨拉牌盒时方可兑换</div>
+                <div class="announce-item {% if not announcements %}active{% endif %}">📣 广告位招租</div>
             </div>
         </div>
-        {% endif %}
+        <div style="text-align:center;padding:16px 0 8px;font-size:12px;color:#4a5568;">
+            &copy; 2026 DFpoke · <a href="https://github.com/LH44666/DFpoke" style="color:#64748b;text-decoration:none;" target="_blank">GitHub</a> · <span style="color:#64748b;">QQ: 3205537988</span>
+        </div>
     </div>
     {% block scripts %}{% endblock %}
     <script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/static/sw.js');
+    }
     (function() {
         var isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
         if (isStandalone) return;

@@ -23,6 +23,7 @@ def verify_password(stored_hash, password):
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', secrets.token_hex(32))
+app.permanent_session_lifetime = timedelta(days=30)
 
 DATABASE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'dfpoke.db')
 
@@ -134,10 +135,22 @@ def index():
         LEFT JOIN cards c ON u.id = c.user_id
         WHERE u.show_in_leaderboard = 1
         GROUP BY u.id
+        HAVING collected < ?
         ORDER BY collected DESC, u.created_at ASC
-    ''', (TOTAL,)).fetchall()
+        LIMIT 10
+    ''', (TOTAL, TOTAL)).fetchall()
+    total_users = db.execute('SELECT COUNT(*) as cnt FROM users').fetchone()['cnt']
+    completed_users = db.execute('''
+        SELECT COUNT(*) as cnt FROM (
+            SELECT u.id FROM users u
+            JOIN cards c ON u.id = c.user_id
+            GROUP BY u.id
+            HAVING COUNT(CASE WHEN c.owned = 1 THEN 1 END) = ?
+        )
+    ''', (TOTAL,)).fetchone()['cnt']
     keywords = get_daily_keywords()
-    return render_template('index.html', users=users, total=TOTAL, keywords=keywords)
+    return render_template('index.html', users=users, total=TOTAL, keywords=keywords,
+                           total_users=total_users, completed_users=completed_users)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -169,6 +182,7 @@ def register():
         db.commit()
         user = db.execute('SELECT id FROM users WHERE username = ?', (username,)).fetchone()
         init_user_cards(db, user['id'])
+        session.permanent = True
         session['user'] = username
         flash('注册成功！', 'success')
         return redirect(url_for('user_page', username=username))
@@ -183,6 +197,7 @@ def login():
         db = get_db()
         user = db.execute('SELECT * FROM users WHERE username = ?', (username,)).fetchone()
         if user and verify_password(user['password_hash'], password):
+            session.permanent = True
             session['user'] = username
             flash('登录成功！', 'success')
             return redirect(url_for('user_page', username=username))

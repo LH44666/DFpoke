@@ -39,6 +39,11 @@
 .rank-1 { color: #ffd700; }
 .rank-2 { color: #c0c0c0; }
 .rank-3 { color: #cd7f32; }
+.username {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 .username a {
     color: #e0e0e0;
     text-decoration: none;
@@ -68,7 +73,51 @@
     color: #64748b;
 }
 .actions { text-align: center; margin-top: 24px; }
-.actions a { margin: 0 8px; }
+.actions a, .actions button { margin: 0 8px; vertical-align: middle; }
+.actions .btn { margin-bottom: 10px; }
+.swap-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 9998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.swap-box {
+    background: #1a2634;
+    border: 1px solid #f4a100;
+    border-radius: 12px;
+    padding: 20px 24px;
+    max-width: 380px;
+    width: 90vw;
+    max-height: 80vh;
+    overflow-y: auto;
+    cursor: default;
+}
+.swap-box h3 {
+    color: #f4a100;
+    font-size: 16px;
+    margin-bottom: 12px;
+    text-align: center;
+}
+.swap-box p {
+    font-size: 13px;
+    color: #c8d6e5;
+    line-height: 1.8;
+    margin-bottom: 8px;
+}
+.swap-box .label {
+    color: #f4a100;
+    font-weight: bold;
+}
+.swap-close {
+    text-align: center;
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 12px;
+}
 
 .daily-section {
     margin-top: 24px;
@@ -83,7 +132,7 @@
 }
 .daily-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
     gap: 8px;
 }
 .daily-card {
@@ -113,12 +162,19 @@
 }
 @media (max-width: 480px) {
     .daily-grid {
-        grid-template-columns: repeat(5, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
         gap: 4px;
     }
     .daily-card { padding: 10px 4px; }
     .daily-card .map-name { font-size: 10px; }
     .daily-card .code { font-size: 18px; letter-spacing: 1px; }
+    .lb-header, .lb-row {
+        grid-template-columns: 30px 1fr 80px 55px;
+        padding: 10px 10px;
+    }
+    .username a { font-size: 13px; }
+    .rank { font-size: 14px; }
+    .progress-text { font-size: 12px; }
 }
 {% endblock %}
 
@@ -126,6 +182,7 @@
 <div class="hero">
     <h1>三角洲行动 - 扑克牌收集</h1>
     <p>集齐 {{ total }} 张牌（52张 + 大小王 + 牌盒）完成挑战！</p>
+    <p style="margin-top:8px;font-size:13px;color:#64748b;">共 {{ total_users }} 位玩家 · {{ completed_users }} 人已集齐</p>
 </div>
 
 <div class="actions">
@@ -133,6 +190,21 @@
     <a href="/register" class="btn">立即注册</a>
     <a href="/login" class="btn btn-outline">已有账号</a>
     {% endif %}
+    <button class="btn btn-outline" onclick="document.getElementById('swapModal').style.display=''">🔄 扑克牌互换</button>
+</div>
+
+<div class="swap-modal" id="swapModal" style="display:none" onclick="this.style.display='none'">
+    <div class="swap-box" onclick="event.stopPropagation()">
+        <h3>🔄 长弓扑克牌互换 3.0 方案</h3>
+        <p style="margin-bottom:14px;">三角洲行动长弓扑克牌互换3.0方案来啦～用于S10赛季补齐重复或缺失的阿萨拉扑克牌哦！</p>
+        <p style="margin-bottom:10px;"><span class="label">🎖 干员选用</span><br>换红牌选工程干员，收购卡牌选女医/蝶</p>
+        <p style="margin-bottom:10px;"><span class="label">♠ 花色批发商</span><br>黑桃老黑 · 红桃比特 · 方块盾哥 · 梅花液氮 · 小王乌鲁鲁</p>
+        <p style="margin-bottom:10px;"><span class="label">🔫 子弹对应牌面</span><br>1发→A · 5发→5 · 10发→10 · 11发→J · 12发→Q · 13发→K</p>
+        <p style="margin-bottom:10px;"><span class="label">📦 交易步骤</span><br>带对应子弹找目标干员，丢子弹到身前，有牌就换，没牌会摇头</p>
+        <p style="margin-bottom:14px;"><span class="label">⏱ 互换频率</span><br>每6分钟一趟互换车</p>
+        <p style="text-align:center;font-size:11px;color:#64748b;margin-bottom:4px;">以上内容仅供参考</p>
+        <div class="swap-close">点击空白处关闭</div>
+    </div>
 </div>
 
 {% if keywords and keywords.list %}
